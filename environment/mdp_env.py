@@ -1,6 +1,8 @@
 import gym
 from gym import spaces
 import numpy as np
+from environment.context import Environment
+from environment.agent import Agent
 
 class CitizenHealthMDP(gym.Env):
     def __init__(self, agent_profile=None, environment_context=None):
@@ -11,11 +13,7 @@ class CitizenHealthMDP(gym.Env):
         self.action_space = spaces.Discrete(len(self.actions))
         self.observation_space = spaces.Discrete(len(self.states))
 
-        self.agent_profile = agent_profile if agent_profile else {
-            "health_state": 0,  # Scale from 0 (very sick) to 4 (very healthy)
-            "housing_state": "ETHOS_0",  # ETHOS 0, 1, 2
-            "administrative_state": "registered"  # "registered" or "non-registered"
-        }
+        self.agent_profile = agent_profile if agent_profile else Agent
         
         # Transition probabilities and rewards (flexible for expansion)
         self.transition_probs = {
@@ -32,16 +30,10 @@ class CitizenHealthMDP(gym.Env):
             if self.transition_probs[(state, action)][0] == 0.0 and state == self.states["sick"]
         ]
 
-        self.environment_context = environment_context if environment_context else {
-            "shelters_available": 5,
-            "government_healthcare_budget": 100000,
-            "government_social_service_budget": 50000,
-            "grid_position": (0, 0),  # (x, y) coordinates in the environment
-            "deprived capabilities": impossible_actions
-        }
+        self.environment_context = environment_context if environment_context else Environment
         
         # Current state
-        self.state = {"name": "sick", "index": self.states["sick"], "profile": agent_profile, "context": environment_context}
+        self.state = {"name": "sick", "index": self.states["sick"], "profile": agent_profile, "context": environment_context, "deprived capabilities": impossible_actions}
         
     def step(self, action):
         # Handle invalid actions gracefully
@@ -63,6 +55,9 @@ class CitizenHealthMDP(gym.Env):
             elif next_state_name == "sicker":
                 self.state["profile"]["health_state"] = max(0, self.state["profile"]["health_state"] - 1)
         
+        # Update environment budget based on the action taken
+        action_name = [key for key, val in self.actions.items() if val == action][0]
+        self.environment_context.update_budget(action_name)
         
         # Check if episode is done
         done = self.state["index"] in [self.states["healthier"], self.states["sicker"]]
@@ -77,4 +72,4 @@ class CitizenHealthMDP(gym.Env):
         return self.state, {}
     
     def render(self):
-        print(f"Current state: {self.state['name']}, Profile: {self.state['profile']}, Context: {self.state['context']}")
+        print(f"Current state: {self.state['name']}, Profile: {self.state['profile']}, Context: {self.state['context'].to_dict()}")

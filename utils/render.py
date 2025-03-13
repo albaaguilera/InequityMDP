@@ -1,3 +1,3 @@
 
 def render(state):
-    print(f"State: {state['name']}, Profile: {state['profile']}, Context: {state['context']}")
+    print(f"State: {state['name']}, Profile: {state['profile']}, Context: {state['context'].to_dict()}")

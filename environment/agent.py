@@ -1,5 +1,12 @@
 
 
+
+agent_profiles = {
+    "agent1": {"health_state": 2, "housing_state": "ETHOS_0", "administrative_state": "registered"},
+    "agent2": {"health_state": 3, "housing_state": "ETHOS_1", "administrative_state": "registered"},
+    "agent3": {"health_state": 1, "housing_state": "ETHOS_2", "administrative_state": "unregistered"}
+}
+
 class Agent:
     def __init__(self, health_state=2, housing_state="ETHOS_0", administrative_state="registered"):
         self.health_state = health_state

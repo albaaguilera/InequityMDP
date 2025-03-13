@@ -1,14 +1,14 @@
 from environment.mdp_env import CitizenHealthMDP
 from environment.agent import Agent
-from environment.context import EnvironmentContext
+from environment.context import Environment
 from utils.render import render
 
 # Create agent and context
 agent = Agent()
-context = EnvironmentContext()
+context = Environment()
 
 # Initialize environment
-env = CitizenHealthMDP(agent_profile=agent.__dict__, environment_context=context.__dict__)
+env = CitizenHealthMDP(agent_profile=agent.__dict__, environment_context=context)
 
 # Run environment
 state, _ = env.reset()
